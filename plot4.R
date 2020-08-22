@@ -6,12 +6,24 @@ data<- read.table("household_power_consumption.txt",
                   na.strings = "?")
 
 pd<- subset(data, Date=="1/2/2007"|Date=="2/2/2007")
-pd$Date<- as.Date(pd$Date,"%d/%m/%y")
-#pd$Time<- strptime(pd$Time,"%X")
-pd<- pd%>%mutate(DoW=weekdays(Date))
+pd<-pd%>%mutate(timestamp=paste(pd$Date,pd$Time))
+pd$timestamp<-strptime(pd$timestamp,"%d/%m/%Y %X")
+
   
-windows()
-#png("plot2.png")
-lines(pd$Global_active_power~pd$Time)
-hist(pd$Global_active_power,col="red",main="Global Active Power", xlab="Global Active Power (kilowatts)")
+
+png("plot4.png")
+par(mfcol=c(2,2))
+with(pd,{
+  plot(timestamp,Global_active_power,type="n",xlab="",ylab="Global Active Power (kilowatts)")
+  lines(timestamp,Global_active_power)
+  plot(timestamp,Sub_metering_1,type="n",xlab="",ylab="Energy sub metering")
+  lines(timestamp,Sub_metering_1,col="black")
+  lines(timestamp,Sub_metering_2,col="red")
+  lines(timestamp,Sub_metering_3,col="blue")
+  legend("topright",legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"),col=c("black","red","blue"),lty=1)
+  plot(timestamp,Voltage,type="n",xlab="datetime",ylab="Voltage")
+  lines(timestamp,Voltage)
+  plot(timestamp,Global_reactive_power,type="n",xlab="datetime")
+  lines(timestamp,Global_reactive_power)
+})
 dev.off()
